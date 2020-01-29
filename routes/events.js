@@ -59,11 +59,6 @@ const eventsApi = (app) => {
                 try {
                     const newStartDate = new Date(Number(startDate)).toJSON().slice(0, 19).replace('T', ' ');
                     const newEndDate = new Date(Number(endDate)).toJSON().slice(0, 19).replace('T', ' ');
-
-                    console.log(newStartDate);
-                    console.log(newEndDate);
-
-
                     const eventId = await eventsService.createEvent(req.decodedToken.sub, { name, category, place, address, startDate: newStartDate, endDate: newEndDate, online });
                     if (eventId) {
                         res.status(201).json({
@@ -98,15 +93,29 @@ const eventsApi = (app) => {
                 res.status(400).json({
                     errors: [`Por favor verifica los valores ingresados`]
                 });
+            } else if (endDate <= startDate) {
+                res.status(400).json({
+                    errors: [`La fecha fin debe ser mayor que la fecha inicio`]
+                });
             } else {
-                const eventId = await eventsService.updateEvent(req.decodedToken.sub, id, { name, category, place, address, startDate, endDate, online });
-                if (eventId) {
-                    res.json({
-                        data: 'El evento fue actualizado exitosamente'
-                    });
-                } else {
+                try {
+                    const newStartDate = new Date(Number(startDate)).toJSON().slice(0, 19).replace('T', ' ');
+                    const newEndDate = new Date(Number(endDate)).toJSON().slice(0, 19).replace('T', ' ');
+                    const eventId = await eventsService.updateEvent(req.decodedToken.sub, id, { name, category, place, address, startDate: newStartDate, endDate: newEndDate, online });
+                    if (eventId) {
+                        res.status(201).json({
+                            data: 'El evento fue actualizado exitosamente'
+                        });
+                    } else {
+                        res.status(400).json({
+                            errors: [`Error actualizando el evento`]
+                        });
+                    }
+                } catch (err) {
+                    console.log(err);
+
                     res.status(400).json({
-                        errors: [`Error actualizando el evento`]
+                        errors: [`Error actualizando el evento`, err]
                     });
                 }
             }

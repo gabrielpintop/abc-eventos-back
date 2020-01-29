@@ -11,7 +11,7 @@ class EventsService {
         return new Promise(async (resolve, reject) => {
             try {
                 const connection = await mysql.connect();
-                const query = `SELECT id, name, category, start_date, end_date, online FROM ${this.table} WHERE user_id = ? ORDER BY creation_date DESC`;
+                const query = `SELECT id, name, category, start_date, place, online FROM ${this.table} WHERE user_id = ? ORDER BY creation_date DESC`;
                 connection.query(query, [userId], (err, results, fields) => {
                     if (err) {
                         console.log(err);
