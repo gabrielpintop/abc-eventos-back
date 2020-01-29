@@ -19,8 +19,8 @@ const verifyToken = (req, res, next) => {
         }
     }
 
-    res.status(301).json({
-        data: 'No te encuentras autorizado'
+    res.status(401).json({
+        errors: ['No te encuentras autorizado']
     });
 };
 

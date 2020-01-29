@@ -56,14 +56,29 @@ const eventsApi = (app) => {
                     errors: [`La fecha fin debe ser mayor que la fecha inicio`]
                 });
             } else {
-                const eventId = await eventsService.createEvent(req.decodedToken.sub, { name, category, place, address, startDate, endDate, online });
-                if (eventId) {
-                    res.status(201).json({
-                        data: eventId
-                    });
-                } else {
+                try {
+                    const newStartDate = new Date(Number(startDate)).toJSON().slice(0, 19).replace('T', ' ');
+                    const newEndDate = new Date(Number(endDate)).toJSON().slice(0, 19).replace('T', ' ');
+
+                    console.log(newStartDate);
+                    console.log(newEndDate);
+
+
+                    const eventId = await eventsService.createEvent(req.decodedToken.sub, { name, category, place, address, startDate: newStartDate, endDate: newEndDate, online });
+                    if (eventId) {
+                        res.status(201).json({
+                            data: eventId
+                        });
+                    } else {
+                        res.status(400).json({
+                            errors: [`Error creando el evento`]
+                        });
+                    }
+                } catch (err) {
+                    console.log(err);
+
                     res.status(400).json({
-                        errors: [`Error creando el evento`]
+                        errors: [`Error creando el evento`, err]
                     });
                 }
             }
